@@ -1,0 +1,76 @@
+import tensorflow as tf
+import numpy as np
+import random
+import cv2
+import os
+from tensorflow.keras import datasets, layers, models
+
+model = models.Sequential()
+model.add(layers.Conv2D(32, (3, 3), activation='relu', input_shape=(220, 220, 3)))
+model.add(layers.MaxPooling2D((2, 2)))
+model.add(layers.Conv2D(64, (5, 5), activation='relu'))
+model.add(layers.MaxPooling2D((2, 2)))
+model.add(layers.Conv2D(64, (5, 5), activation='relu'))
+model.add(layers.MaxPooling2D((2, 2)))
+model.add(layers.Conv2D(64, (3, 3), activation='relu'))
+model.add(layers.MaxPooling2D((2, 2)))
+model.add(layers.Flatten())
+model.add(layers.Dense(50, activation='relu'))
+model.add(layers.Dense(7, activation='softmax'))
+
+model.summary()
+
+model.compile(optimizer='adam',
+        loss='sparse_categorical_crossentropy',
+        metrics=['accuracy'])
+
+training_dir = "./processed_data/"
+frames_dir = training_dir + "frames"
+labels_dir = training_dir + "labels"
+
+def string_to_int(s):
+    if s == "fist":
+        return 0
+    elif s == "palm":
+        return 1
+    elif s == "point_up":
+        return 2
+    elif s == "point_down":
+        return 3
+    elif s == "point_left":
+        return 4
+    elif s == "point_right":
+        return 5
+    else:
+        return 6
+
+def create_training_data():
+    training_data = []
+    for img in os.listdir(frames_dir):
+        i = img[:len(img) - 4]
+        img_array = cv2.imread(os.path.join(frames_dir, img))
+
+        f = open(os.path.join(labels_dir, str(i) + '.txt'), 'r')
+        label = string_to_int(f.read())
+        f.close()
+
+        training_data.append([img_array, label])
+        
+        if len(training_data) % 100 == 0:
+          print(len(training_data))
+
+    random.shuffle(training_data)
+
+    X = []
+    y = []
+    for feat, label in training_data:
+        X.append(feat)
+        y.append(label)
+    X = np.array(X)
+    y = np.array(y)
+    return X, y
+
+X, y = create_training_data()
+X = X/255.0
+
+model.fit(X, y, batch_size=16, epochs=100, validation_split=0.3)
