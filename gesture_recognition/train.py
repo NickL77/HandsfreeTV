@@ -6,7 +6,7 @@ import os
 from tensorflow.keras import datasets, layers, models
 
 model = models.Sequential()
-model.add(layers.Conv2D(32, (3, 3), activation='relu', input_shape=(220, 220, 3)))
+model.add(layers.Conv2D(32, (3, 3), activation='relu', input_shape=(220, 220, 1)))
 model.add(layers.MaxPooling2D((2, 2)))
 model.add(layers.Conv2D(64, (5, 5), activation='relu'))
 model.add(layers.MaxPooling2D((2, 2)))
@@ -15,7 +15,10 @@ model.add(layers.MaxPooling2D((2, 2)))
 model.add(layers.Conv2D(64, (3, 3), activation='relu'))
 model.add(layers.MaxPooling2D((2, 2)))
 model.add(layers.Flatten())
+model.add(layers.Dense(100, activation='relu'))
+model.add(layers.Dropout(0.25))
 model.add(layers.Dense(50, activation='relu'))
+model.add(layers.Dropout(0.25))
 model.add(layers.Dense(7, activation='softmax'))
 
 model.summary()
@@ -48,7 +51,11 @@ def create_training_data():
     training_data = []
     for img in os.listdir(frames_dir):
         i = img[:len(img) - 4]
-        img_array = cv2.imread(os.path.join(frames_dir, img))
+        color_img = cv2.imread(os.path.join(frames_dir, img))
+
+        # convert to grayscale
+        gray = cv2.cvtColor(color_img, cv2.COLOR_BGR2GRAY)
+        img_array = gray.reshape(gray.shape + (1,))
 
         f = open(os.path.join(labels_dir, str(i) + '.txt'), 'r')
         label = string_to_int(f.read())
@@ -56,9 +63,6 @@ def create_training_data():
 
         training_data.append([img_array, label])
         
-        if len(training_data) % 100 == 0:
-          print(len(training_data))
-
     random.shuffle(training_data)
 
     X = []
@@ -73,4 +77,4 @@ def create_training_data():
 X, y = create_training_data()
 X = X/255.0
 
-model.fit(X, y, batch_size=16, epochs=100, validation_split=0.3)
+model.fit(X, y, batch_size=32, epochs=100, validation_split=0.3, shuffle=True)
