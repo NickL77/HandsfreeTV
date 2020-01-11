@@ -7,18 +7,12 @@ from tensorflow.keras import datasets, layers, models
 
 model = models.Sequential()
 model.add(layers.Conv2D(32, (3, 3), activation='relu', input_shape=(220, 220, 1)))
-model.add(layers.MaxPooling2D((2, 2)))
-model.add(layers.Conv2D(64, (5, 5), activation='relu'))
-model.add(layers.MaxPooling2D((2, 2)))
-model.add(layers.Conv2D(64, (5, 5), activation='relu'))
-model.add(layers.MaxPooling2D((2, 2)))
 model.add(layers.Conv2D(64, (3, 3), activation='relu'))
 model.add(layers.MaxPooling2D((2, 2)))
+model.add(layers.Dropout(0.25))
 model.add(layers.Flatten())
 model.add(layers.Dense(100, activation='relu'))
-model.add(layers.Dropout(0.25))
-model.add(layers.Dense(50, activation='relu'))
-model.add(layers.Dropout(0.25))
+model.add(layers.Dropout(0.5))
 model.add(layers.Dense(7, activation='softmax'))
 
 model.summary()
@@ -62,7 +56,7 @@ def create_training_data():
         f.close()
 
         training_data.append([img_array, label])
-        
+
     random.shuffle(training_data)
 
     X = []
@@ -77,4 +71,8 @@ def create_training_data():
 X, y = create_training_data()
 X = X/255.0
 
-model.fit(X, y, batch_size=32, epochs=100, validation_split=0.3, shuffle=True)
+callbacks = [tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=3),
+             tf.keras.callbacks.ModelCheckpoint(filepath='model.h5', monitor='val_loss', save_best_only=True)]
+model.fit(X, y, batch_size=32, epochs=100, validation_split=0.3, callbacks=callbacks, shuffle=True)
+
+model.save("model.h5")

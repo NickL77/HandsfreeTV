@@ -5,7 +5,7 @@ import numpy as np
 
 # params to set
 types = ["palm", "fist", "point_right", "point_left", "point_up", "point_down", "other"]
-num_per_set = 10
+num_per_set = 100
 rect_top_left = (20, 50) # width, height
 height, width = 220, 220
 rect_bot_left = (rect_top_left[0] + width, rect_top_left[1] + height)
