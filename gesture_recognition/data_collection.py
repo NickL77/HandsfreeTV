@@ -3,7 +3,7 @@ import os
 import argparse
 import numpy as np
 
-# flags to set
+# params to set
 types = ["palm", "fist", "point_right", "point_left", "point_up", "point_down", "other"]
 num_per_set = 10
 rect_top_left = (20, 50) # width, height
@@ -26,7 +26,7 @@ def main():
         return
     else:
         print("Making data folder...")
-        os.makedirs(folder)
+        #os.makedirs(folder)
 
     curr_type = 0
     count = 0
@@ -40,7 +40,7 @@ def main():
         cv2.imshow("frame", frame)
 
         cropped_frame = frame[rect_top_left[1] : rect_top_left[1]+height, rect_top_left[0] : rect_top_left[0]+width]
-        cv2.imshow("cropped_frame", cropped_frame)
+        cv2.imshow("cropped", cropped_frame)
 
         key = cv2.waitKey(30) & 0xFF
 
@@ -53,7 +53,7 @@ def main():
 
             path = "{}/{}/image_{:03d}.jpg".format(folder, types[curr_type], count)
             print("Saving to {}".format(path))
-            cv2.imwrite(path, frame)
+            cv2.imwrite(path, cropped_frame)
 
             if count == num_per_set - 1:
                 curr_type += 1
