@@ -26,7 +26,7 @@ def main():
         return
     else:
         print("Making data folder...")
-        #os.makedirs(folder)
+        os.makedirs(folder)
 
     curr_type = 0
     count = 0
