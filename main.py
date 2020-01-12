@@ -13,6 +13,7 @@ import pubsub as pub
 import threading
 
 from YTControl.YTControl import YTControl
+import gesture_recognition.infer as infer
 
 search_event_pub = 'SEARCH_TOPIC'
 
@@ -173,11 +174,15 @@ def speech_to_text_thread(yt):
 
 def main():
 
-    yt = YTControl('https://www.youtube.com/watch?v=mvMJl_0oQ_8')
+    yt = YTControl('https://www.youtube.com/watch?v=4D3X6Xl5c_Y')
 
+    gest = threading.Thread(target=infer.gesture_thread, args=(yt,))
     s2t = threading.Thread(target=speech_to_text_thread, args=(yt,))
+    gest.start()
     s2t.start()
+    gest.join()
     s2t.join()
+
 
 
 if __name__ == '__main__':

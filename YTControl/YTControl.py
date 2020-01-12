@@ -28,11 +28,13 @@ class YTControl:
 
     def play(self):
         if self.paused:
+            print("PLAYING")
             self.element.send_keys('k')
             self.paused = False
 
     def pause(self):
         if not self.paused:
+            print("PAUSING")
             self.element.send_keys('k')
             self.paused = True
 
@@ -64,7 +66,7 @@ class YTControl:
         elem.send_keys(keyword)
         elem.send_keys(Keys.RETURN)
 
-        time.sleep(0.5)
+        time.sleep(1.5)
 
         try:
             self.element = WebDriverWait(self.driver, 10).until(
@@ -74,4 +76,13 @@ class YTControl:
             print('SUPER DUPER FAIL')
             raise RuntimeError()
         self.driver.find_element_by_tag_name("ytd-video-renderer").click()
+        try:
+            self.element = WebDriverWait(self.driver, 10).until(
+                    EC.presence_of_element_located((By.ID, "movie_player"))
+            )
+            self.paused = False
+        except Exception:
+            raise RuntimeError()
+
+
 

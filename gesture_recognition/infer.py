@@ -2,9 +2,14 @@ import cv2
 import random
 import glob
 import tensorflow as tf
-import os
+import os, sys
 import numpy as np
 import collections
+import time
+
+sys.path.append(os.path.abspath('../YTControl'))
+
+from YTControl import YTControl
 
 types = ["palm", "fist", "right", "left", "up", "down", "other"]
 
@@ -13,7 +18,7 @@ green_hi = (50, 255, 50)
 red_low = (0, 0, 150)
 red_hi = (50, 50, 255)
 
-image_buffer_directory = "image_buffer/"
+image_buffer_directory = "/home/nick/Programming/handsfreeTV/gesture_recognition/image_buffer/"
 
 ring_buf = collections.deque(maxlen=5)
 
@@ -46,12 +51,16 @@ def int_to_type(i):
         return None
 
 # entry point
-def main():
+# def main():
 
-    model = tf.keras.models.load_model("model.h5")
+def gesture_thread(yt):
+
+    model = tf.keras.models.load_model("/home/nick/Programming/handsfreeTV/gesture_recognition/model.h5")
 
     recent_1 = []
     recent_2 = []
+    prev_time = 0
+    reading = ''
 
     while True:
 
@@ -59,15 +68,15 @@ def main():
         for i in range(len(images)):
 
             f = image_buffer_directory + images[i]
-            time = os.path.getmtime(f)
+            f_time = os.path.getmtime(f)
 
             if i == 0:
-                recent_1 = [f, time]
+                recent_1 = [f, f_time]
             elif i == 1:
-                recent_2 = [f, time]
+                recent_2 = [f, f_time]
             else:
                 replace = min([recent_1, recent_2], key=lambda x: x[1])
-                if replace[1] < time:
+                if replace[1] < f_time:
                     replace[0] = f
                     replace[1]
 
@@ -92,6 +101,9 @@ def main():
 
         resized = cv2.resize(mask, (240, 180))
         cv2.imshow("resized", resized)
+        cv2.putText(frame, reading, (10, 25), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2, cv2.LINE_AA)
+        cv2.imshow("orig", frame)
+
         r = np.expand_dims(resized.reshape(resized.shape + (1, )), axis=0)
 
         pred = model.predict_classes(r)
@@ -99,11 +111,28 @@ def main():
         ring_buf.append(pred)
 
         if valid_entry():
-            print(ring_buf[1])
+            gesture = ring_buf[1]
+            reading = gesture
+            print(gesture)
 
+            if time.time() - prev_time > 2:
+                
+                if gesture == 'fist':
+                    yt.pause()
+                elif gesture == 'palm':
+                    yt.play()
+                elif gesture == 'up':
+                    yt.volume_up()
+                elif gesture == 'down':
+                    yt.volume_down()
+
+                print('action taken')
+                prev_time = time.time()
+
+                
         key = cv2.waitKey(30)
         if key == ord('q'):
             break
 
-if __name__ == "__main__":
-    main()
+#if __name__ == "__main__":
+#    main()
