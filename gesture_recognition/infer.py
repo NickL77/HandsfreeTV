@@ -8,14 +8,17 @@ import collections
 
 types = ["palm", "fist", "right", "left", "up", "down", "other"]
 
-bgr_low = (0, 150, 0)
-bgr_high = (50, 255, 50)
+green_low = (0, 150, 0)
+green_hi = (50, 255, 50)
+red_low = (0, 0, 150)
+red_hi = (50, 50, 255)
+
 image_buffer_directory = "image_buffer/"
 
-ring_buf = collections.deque(maxlen=10)
+ring_buf = collections.deque(maxlen=5)
 
 def valid_entry():
-    if not len(ring_buf) == 10:
+    if not len(ring_buf) == 5:
         return False
     a = ring_buf[0]
     for i in range(1, len(ring_buf)):
@@ -45,7 +48,7 @@ def int_to_type(i):
 # entry point
 def main():
 
-    model = tf.keras.models.load_model("old_model.h5")
+    model = tf.keras.models.load_model("model.h5")
 
     recent_1 = []
     recent_2 = []
@@ -69,6 +72,12 @@ def main():
                     replace[1]
 
         frame = cv2.imread(recent_1[0])
+        """
+
+    for f in glob.glob("./new_data/palm/*.jpg"):
+        frame = cv2.imread(f)
+        print(f)
+        """
 
         if frame is None:
             continue
@@ -76,10 +85,13 @@ def main():
         if h == 0 or w == 0:
             continue
 
-        cv2.imshow("frame", frame)
-        frame = cv2.inRange(frame, bgr_low, bgr_high)
 
-        resized = cv2.resize(frame, (240, 180))
+        green_mask = cv2.inRange(frame, green_low, green_hi)
+        red_mask = cv2.inRange(frame, red_low, red_hi)
+        mask = green_mask + red_mask
+
+        resized = cv2.resize(mask, (240, 180))
+        cv2.imshow("resized", resized)
         r = np.expand_dims(resized.reshape(resized.shape + (1, )), axis=0)
 
         pred = model.predict_classes(r)
@@ -88,9 +100,6 @@ def main():
 
         if valid_entry():
             print(ring_buf[1])
-
-        cv2.imshow("mask", frame)
-        cv2.imshow("resized", resized)
 
         key = cv2.waitKey(30)
         if key == ord('q'):
