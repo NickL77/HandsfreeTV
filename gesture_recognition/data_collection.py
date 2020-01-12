@@ -59,10 +59,10 @@ def main():
         h, w, c = frame.shape
         if h == 0 or w == 0:
             continue
-        mask = cv2.inRange(frame, bgr_low, bgr_high) 
+        #mask = cv2.inRange(frame, bgr_low, bgr_high) 
 
         cv2.imshow("frame", frame)
-        cv2.imshow("mask", mask)
+        #cv2.imshow("mask", mask)
 
         key = cv2.waitKey(30)
 
@@ -75,7 +75,7 @@ def main():
 
             path = "{}/{}/image_{:03d}.jpg".format(folder, types[curr_type], count)
             print("Saving to {}".format(path))
-            cv2.imwrite(path, mask)
+            cv2.imwrite(path, frame)
 
             if count == num_per_set - 1:
                 curr_type += 1
