@@ -10,7 +10,7 @@ types = ["palm", "fist", "right", "left", "up", "down", "other"]
 
 bgr_low = (0, 150, 0)
 bgr_high = (50, 255, 50)
-image_buffer_directory = "imageBuffer/"
+image_buffer_directory = "image_buffer/"
 
 ring_buf = collections.deque(maxlen=10)
 

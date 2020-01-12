@@ -1,3 +1,4 @@
+import time
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
@@ -62,6 +63,8 @@ class YTControl:
         elem.clear()
         elem.send_keys(keyword)
         elem.send_keys(Keys.RETURN)
+
+        time.sleep(0.5)
 
         try:
             self.element = WebDriverWait(self.driver, 10).until(
