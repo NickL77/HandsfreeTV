@@ -7,7 +7,7 @@ from selenium.webdriver.support import expected_conditions as EC
 class YTControl:
 
     def __init__(self, link):
-        self.driver = webdriver.Firefox()
+        self.driver = webdriver.Chrome()
         self.driver.get(link)
         self.paused = True
         self.fullscreen = False
@@ -20,8 +20,8 @@ class YTControl:
             self.element = WebDriverWait(self.driver, 10).until(
                     EC.presence_of_element_located((By.ID, "movie_player"))
             )
-        except e:
-            raise RuntimeError(e)
+        except Exception:
+            raise RuntimeError()
 
         self.play()
 
@@ -56,3 +56,18 @@ class YTControl:
         if self.fullscreen:
             self.element.send_keys('f')
             self.fullscreen = False
+
+    def search(self, keyword):
+        elem = self.driver.find_element_by_name("search_query")
+        elem.clear()
+        elem.send_keys(keyword)
+        elem.send_keys(Keys.RETURN)
+
+        try:
+            self.element = WebDriverWait(self.driver, 10).until(
+                    EC.presence_of_element_located((By.TAG_NAME, "ytd-video-renderer"))
+            )
+        except Exception:
+            raise RuntimeError()
+        self.driver.find_element_by_tag_name("ytd-video-renderer").click()
+
