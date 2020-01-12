@@ -6,8 +6,8 @@ import shutil
 move images that we do not want to be detected into the others directoru
 '''
 
-data_dir = './data/'
-paths = ['fist/', 'palm/', 'point_right/', 'point_left/', 'point_up/', 'point_down/']
+data_dir = './final_data/'
+paths = ['fist/', 'palm/', 'right/', 'left/', 'up/', 'down/']
 negatives = data_dir + 'other/'
 neg_i = len(os.listdir(negatives))
 
@@ -27,6 +27,7 @@ for p in paths:
             elif key == ord('d'):
                 other_img_name = negatives + str(neg_i) + '.jpg'
                 shutil.move(img_path, other_img_name)
+                neg_1 += 1
                 break
 
 
