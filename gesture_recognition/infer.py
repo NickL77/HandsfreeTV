@@ -1,49 +1,66 @@
 import cv2
+import random
+import glob
 import tensorflow as tf
 import os
 import numpy as np
 
-types = ["palm", "fist", "point_right", "point_left", "point_up", "point_down", "other"]
-rect_top_left = (20, 50) # width, height
-height, width = 220, 220
-rect_bot_left = (rect_top_left[0] + width, rect_top_left[1] + height)
-color = (255, 0, 0) # BGR
-thickness = 2
+# params to set
+types = ["palm", "fist", "right", "left", "up", "down", "other"]
+
+bgr_low = (0, 150, 0)
+bgr_high = (50, 255, 50)
+image_buffer_directory = "imageBuffer/"
 
 # entry point
 def main():
-    cap = cv2.VideoCapture(0)
-    model = tf.keras.models.load_model("early_save.h5")
 
-    """
-    frame = cv2.imread("./processed_data/frames/000.jpg")
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    gray = np.expand_dims(gray.reshape(gray.shape + (1, )), axis=0)
-    gray = gray/255
-    print(model.predict_classes(gray))
+    model = tf.keras.models.load_model("old_model.h5")
 
-    cv2.imshow("frame", frame)
+    recent_1 = []
+    recent_2 = []
 
-    """
-    while cap.isOpened():
-        _, frame = cap.read()
+    while True:
 
-        frame = cv2.rectangle(frame, rect_top_left, rect_bot_left, color, thickness)
+        images = os.listdir(image_buffer_directory)
+        for i in range(len(images)):
+
+            f = image_buffer_directory + images[i]
+            time = os.path.getmtime(f)
+
+            if i == 0:
+                recent_1 = [f, time]
+            elif i == 1:
+                recent_2 = [f, time]
+            else:
+                replace = min([recent_1, recent_2], key=lambda x: x[1])
+                if replace[1] < time:
+                    replace[0] = f
+                    replace[1]
+
+        frame = cv2.imread(recent_1[0])
+
+        if frame is None:
+            continue
+        h, w, c = frame.shape
+        if h == 0 or w == 0:
+            continue
+
         cv2.imshow("frame", frame)
+        frame = cv2.inRange(frame, bgr_low, bgr_high)
 
-        cropped_frame = frame[rect_top_left[1] : rect_top_left[1]+height, rect_top_left[0] : rect_top_left[0]+width]
-        gray = cv2.cvtColor(cropped_frame, cv2.COLOR_BGR2GRAY)
-        cv2.imshow("gray", gray)
-        
-        gray = np.expand_dims(gray.reshape(gray.shape + (1, )), axis=0)
-        gray = gray/255
+        resized = cv2.resize(frame, (240, 180))
+        r = np.expand_dims(resized.reshape(resized.shape + (1, )), axis=0)
 
-        key = cv2.waitKey(30) & 0xFF
+        pred = model.predict_classes(r)
+        print(pred)
 
+        cv2.imshow("mask", frame)
+        cv2.imshow("resized", resized)
+
+        key = cv2.waitKey(30)
         if key == ord('q'):
             break
-
-        print(model.predict_classes(gray))
 
 if __name__ == "__main__":
     main()

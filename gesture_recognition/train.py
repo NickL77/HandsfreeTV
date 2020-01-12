@@ -6,13 +6,16 @@ import os
 from tensorflow.keras import datasets, layers, models
 
 model = models.Sequential()
-model.add(layers.Conv2D(32, (3, 3), activation='relu', input_shape=(220, 220, 1)))
+model.add(layers.Conv2D(32, (5, 5), activation='relu', input_shape=(180, 240, 1)))
+model.add(layers.MaxPooling2D((2, 2)))
+model.add(layers.Conv2D(64, (3, 3), activation='relu'))
+model.add(layers.MaxPooling2D((2, 2)))
 model.add(layers.Conv2D(64, (3, 3), activation='relu'))
 model.add(layers.MaxPooling2D((2, 2)))
 model.add(layers.Dropout(0.25))
 model.add(layers.Flatten())
 model.add(layers.Dense(100, activation='relu'))
-model.add(layers.Dropout(0.5))
+model.add(layers.Dropout(0.25))
 model.add(layers.Dense(7, activation='softmax'))
 
 model.summary()
@@ -30,26 +33,27 @@ def string_to_int(s):
         return 0
     elif s == "palm":
         return 1
-    elif s == "point_up":
+    elif s == "up":
         return 2
-    elif s == "point_down":
+    elif s == "down":
         return 3
-    elif s == "point_left":
+    elif s == "left":
         return 4
-    elif s == "point_right":
+    elif s == "right":
         return 5
-    else:
+    elif s == "other":
         return 6
+    else:
+        print("WTF")
+        return None
 
 def create_training_data():
     training_data = []
     for img in os.listdir(frames_dir):
-        i = img[:len(img) - 4]
-        color_img = cv2.imread(os.path.join(frames_dir, img))
+        i = img[:len(img)-4]
 
-        # convert to grayscale
-        gray = cv2.cvtColor(color_img, cv2.COLOR_BGR2GRAY)
-        img_array = gray.reshape(gray.shape + (1,))
+        img_array = cv2.imread(os.path.join(frames_dir, img), 0)
+        img_array = img_array.reshape(img_array.shape + (1,))
 
         f = open(os.path.join(labels_dir, str(i) + '.txt'), 'r')
         label = string_to_int(f.read())
@@ -69,10 +73,9 @@ def create_training_data():
     return X, y
 
 X, y = create_training_data()
-X = X/255.0
 
-callbacks = [tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=3),
+callbacks = [tf.keras.callbacks.EarlyStopping(monitor='val_loss', patience=10),
              tf.keras.callbacks.ModelCheckpoint(filepath='model.h5', monitor='val_loss', save_best_only=True)]
-model.fit(X, y, batch_size=32, epochs=100, validation_split=0.3, callbacks=callbacks, shuffle=True)
+model.fit(X, y, batch_size=64, epochs=100, validation_split=0.3, callbacks=callbacks, shuffle=True)
 
 model.save("model.h5")

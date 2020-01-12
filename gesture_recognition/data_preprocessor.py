@@ -1,4 +1,5 @@
 import argparse
+import cv2
 import sys
 import os
 import glob
@@ -27,7 +28,10 @@ folders = [os.path.join(data_folder, o) for o in os.listdir(data_folder)
 
 for folder in folders:
     for f in glob.glob("{}/*.jpg".format(folder)):
-        shutil.copy(f, "{}/frames/{:03d}.jpg".format(output_folder, curr_frame))
+        # default copy
+        frame = cv2.imread(f)
+        resized = cv2.resize(frame, (240, 180))
+        cv2.imwrite("{}/frames/{:03d}.jpg".format(output_folder, curr_frame), resized)
         label_file = open("{}/labels/{:03d}.txt".format(output_folder, curr_frame), "w")
         label = folder.split("/")[1]
         label_file.write(label)
