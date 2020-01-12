@@ -7,7 +7,7 @@ from selenium.webdriver.support import expected_conditions as EC
 class YTControl:
 
     def __init__(self, link):
-        self.driver = webdriver.Chrome()
+        self.driver = webdriver.Firefox()
         self.driver.get(link)
         self.paused = True
         self.fullscreen = False
@@ -68,6 +68,7 @@ class YTControl:
                     EC.presence_of_element_located((By.TAG_NAME, "ytd-video-renderer"))
             )
         except Exception:
+            print('SUPER DUPER FAIL')
             raise RuntimeError()
         self.driver.find_element_by_tag_name("ytd-video-renderer").click()
 
