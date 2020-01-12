@@ -1,8 +1,8 @@
 import os
 import shutil
 
-output_dir = "final_data"
-input_dirs = ["data", "data1", "old_data"]
+output_dir = "new_data"
+input_dirs = ["data", "data1", "data2"]
 
 subgroups = []
 
