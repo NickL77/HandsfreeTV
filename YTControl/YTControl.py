@@ -40,8 +40,17 @@ class YTControl:
 
     def volume_up(self):
         self.element.send_keys(Keys.UP)
+        self.element.send_keys(Keys.UP)
+        self.element.send_keys(Keys.UP)
+        self.element.send_keys(Keys.UP)
+        self.element.send_keys(Keys.UP)
+
 
     def volume_down(self):
+        self.element.send_keys(Keys.DOWN)
+        self.element.send_keys(Keys.DOWN)
+        self.element.send_keys(Keys.DOWN)
+        self.element.send_keys(Keys.DOWN)
         self.element.send_keys(Keys.DOWN)
 
     def seek_forward(self):
@@ -66,7 +75,7 @@ class YTControl:
         elem.send_keys(keyword)
         elem.send_keys(Keys.RETURN)
 
-        time.sleep(1.5)
+        time.sleep(2.5)
 
         try:
             self.element = WebDriverWait(self.driver, 10).until(
