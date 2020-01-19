@@ -9,7 +9,7 @@ As of now, HandsfreeTV works to use voice and gestures to search for and control
 For gesture detection we are currently using an open-source Google Research project called [MediaPipe](https://github.com/google/mediapipe). We are using their [realtime hand-tracking](https://ai.googleblog.com/2019/08/on-device-real-time-hand-tracking-with.html) to get hand features and passing that image to a custom CNN model trained on over 15,000 collected images. Currently, the model can has 7 classifiers (fist, palm, right, left, up, down, and other).
 
 <p align="center">
-    <img src="gesture_tracking.gif" width="800" height="470"/>
+    <img src="gesture_tracking.gif" width="640" height="470"/>
 </p>
 
 ## Voice Control
