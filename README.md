@@ -22,6 +22,6 @@ The goal for HandsfreeTV was to test an alternative user-interface for Smart TV'
 
 In addition, because this project was hacked together at SBHacks 2020, there are many improvements to be made: 
 1. Overall Code Structure - Modulize each component, rather than throwing everything in one `main.py`
-2. Properly retrieve data from MediaPipe - Currently we are using a rudimentary hack of writing images to files and reading the second most recently modified file to pass data from MediaPipe to our code. Alternative methods to fixing this
-  * Passing images through shared memory or TCP sockets
-  * Writing a python wrapper around MediaPipe - this method would also allow us to retrieve intermediate information such as feature locations rather than just the final image output.
+2. Properly retrieve data from MediaPipe - Currently we are using a rudimentary hack of writing images to files and reading the second most recently modified file to pass data from MediaPipe to our code. Alternative methods to fixing this:
+    * Passing images through shared memory or TCP sockets
+    * Writing a python wrapper around MediaPipe - this method would also allow us to retrieve intermediate information such as feature locations rather than just the final image output.
