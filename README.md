@@ -2,7 +2,7 @@
 
 HandsfreeTV was created with the intent of giving everyone a hands-free experience while watching entertainment. We approached this idea by combining two previously disjoint user-interfaces, voice and gesture recognition. By combining these two modules we can create a natural and comprehensive way to interact with today’s digital entertainment.
 
-As of now, HandsfreeTV works to use voice and gestures to search for and control YouTube videos.
+As of now, HandsfreeTV works to use voice and gestures to search for and control YouTube videos. You can find a video demo [here](https://youtu.be/1v2MmMLJ3HA).
 
 ## Gesture Detection
 
